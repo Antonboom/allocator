@@ -1,13 +1,19 @@
-#include <assert.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+/*	
+	Задача: при помощи функции syscall реализовать аллокатор памяти. 
+	Должны быть имплементированы функции malloc, calloc, realloc, free.	
+*/
 
+
+// Обрабатываем блоки памяти с помощью списка
 void *memory_list_head = NULL;
 void *memory_list_tail = NULL;
 
 
+// Информация о блоке памяти
 struct CMemoryBlockInfo {
 	size_t size;
 	int is_free;
@@ -17,7 +23,23 @@ struct CMemoryBlockInfo {
 
 #define Block struct CMemoryBlockInfo
 #define MEMORY_BLOCK_INFO_SIZE sizeof(Block)
+
+// #define __NR_brk 45
 #define BRK_FAILED -1
+
+
+// int asm_brk(void *addr) {
+// 	int result = -1;
+
+// 	asm volatile (
+// 		"syscall"
+// 		: "=a" (result)
+//         : "0"(__NR_brk), "D"(addr)
+//         : "rcx", "r11", "cc"
+//     );
+
+//     return result;
+// }
 
 
 Block *get_block_pointer(void *ptr) {
