@@ -17,7 +17,7 @@ struct CMemoryBlockInfo {
 
 #define Block struct CMemoryBlockInfo
 #define MEMORY_BLOCK_INFO_SIZE sizeof(Block)
-#define SBRK_FAILED ((void *)-1)
+#define BRK_FAILED -1
 
 
 Block *get_block_pointer(void *ptr) {
@@ -47,8 +47,8 @@ Block *memory_request(size_t size) {
 	Block *new_block = NULL;
 	new_block = sbrk(0);
 
-	void *request = sbrk(size + MEMORY_BLOCK_INFO_SIZE);
-	if (request == SBRK_FAILED) {
+	int request = brk(new_block + MEMORY_BLOCK_INFO_SIZE + size);
+	if (request == BRK_FAILED) {
 		return NULL;
 	}
 
@@ -65,7 +65,7 @@ Block *memory_request(size_t size) {
 }
 
 
-void* malloc(size_t sizemem) {
+void *malloc(size_t sizemem) {
 	if (sizemem <= 0) {
 		return NULL;
 	}
@@ -80,7 +80,6 @@ void* malloc(size_t sizemem) {
 		memory_list_head = block;
 		memory_list_tail = block;
 	} else {
-		Block *last = memory_list_head;
 		block = find_free_block(sizemem);
 		if (!block) {
 			block = memory_request(sizemem);
@@ -138,9 +137,4 @@ void *calloc(size_t num, size_t size) {
 	void *new_block_ptr = malloc(sizemem);
 	memset(new_block_ptr, 0, sizemem);
 	return new_block_ptr;
-}
-
-
-int main(void) {
-	return 0;
 }
